@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+  base: './', 
   preview: {
     // Asegura que el servidor se exponga en todas las interfaces
     host: true,
