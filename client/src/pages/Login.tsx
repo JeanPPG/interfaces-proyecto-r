@@ -19,7 +19,7 @@ export function Login() {
     console.log("Intentando iniciar sesión con:", { email, password });
 
     try {
-      const response = await fetch("https://interfaces-proyecto-r-production.up.railway.app/login", {  
+      const response = await fetch("/login", {  
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,7 +35,7 @@ export function Login() {
       if (!response.ok) throw new Error(data.message || "Error desconocido");
 
       login(email);
-      navigate("https://interfaces-proyecto-r-production.up.railway.app/testing");  // Redirige si la autenticación es correcta
+      navigate("/testing");  // Redirige si la autenticación es correcta
     } catch (error: any) {
       console.error("Error en la solicitud:", error);
       setError(error.message);
@@ -127,7 +127,7 @@ export function Login() {
       <p className="mt-4 text-center text-gray-600">
         ¿No tienes una cuenta?{" "}
         <button
-          onClick={() => navigate("https://interfaces-proyecto-r-production.up.railway.app/register")}
+          onClick={() => navigate("/register")}
           className="text-blue-600 hover:underline transition-all duration-300"
         >
           Regístrate
