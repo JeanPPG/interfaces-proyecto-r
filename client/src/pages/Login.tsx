@@ -19,7 +19,7 @@ export function Login() {
     console.log("Intentando iniciar sesión con:", { email, password });
 
     try {
-      const response = await fetch("https://interfaces-proyecto-r-production.up.railway.app/login", {  
+      const response = await fetch("/login", {  
         method: "POST",
         headers: {
           "Content-Type": "application/json",
