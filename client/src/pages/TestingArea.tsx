@@ -519,7 +519,7 @@ export function TestingArea() {
             <button
               disabled={!gamesCompleted || !cameraActive}
               role="button"
-              onClick={() => navigate('/d2r')}
+              onClick={() => navigate('https://interfaces-proyecto-r-production.up.railway.app/d2r')}
               className={`w-full py-2 px-4 rounded-lg transition-colors ${
                 gamesCompleted && cameraActive
                   ? "bg-blue-600 text-white hover:bg-blue-700"
