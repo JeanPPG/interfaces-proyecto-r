@@ -25,7 +25,7 @@ export function Register() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://interfaces-proyecto-r-production.up.railway.app/register", {  // 🔹 Reemplaza con tu URL de Railway
+      const response = await fetch("/register", {  // 🔹 Reemplaza con tu URL de Railway
         method: "POST",
         headers: {
           "Content-Type": "application/json",
