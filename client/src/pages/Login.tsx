@@ -16,6 +16,8 @@ export function Login() {
     setIsLoading(true);
     setError("");
 
+    console.log("Intentando iniciar sesión con:", { email, password });
+
     try {
       const response = await fetch("https://interfaces-proyecto-r-production.up.railway.app/login", {  
         method: "POST",
@@ -25,12 +27,17 @@ export function Login() {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log("Respuesta del servidor:", response);
+
       const data = await response.json();
+      console.log("Datos recibidos:", data);
+
       if (!response.ok) throw new Error(data.message || "Error desconocido");
 
       login(email);
       navigate("/testing");  // Redirige si la autenticación es correcta
     } catch (error: any) {
+      console.error("Error en la solicitud:", error);
       setError(error.message);
     } finally {
       setIsLoading(false);
