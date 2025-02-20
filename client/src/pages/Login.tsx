@@ -19,7 +19,7 @@ export function Login() {
     console.log("Intentando iniciar sesión con:", { email, password });
 
     try {
-      const response = await fetch("backend-flask-production.up.railway.app/login", {  
+      const response = await fetch("http://backend-flask-production.up.railway.app:8080/login", {  
         method: "POST",
         headers: {
           "Content-Type": "application/json",
