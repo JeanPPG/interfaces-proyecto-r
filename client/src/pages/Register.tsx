@@ -25,7 +25,7 @@ export function Register() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("backend-flask-production.up.railway.app/register", {  // 🔹 Reemplaza con tu URL de Railway
+      const response = await fetch("https://backend-flask-production.up.railway.app/register", {  // 🔹 Reemplaza con tu URL de Railway
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,7 +37,7 @@ export function Register() {
       if (!response.ok) throw new Error(data.message || "Error desconocido");
 
       setSuccess("Registro exitoso. Redirigiendo...");
-      setTimeout(() => navigate("https://interfaces-proyecto-r-production.up.railway.app/login"), 2000);
+      setTimeout(() => navigate("/login"), 2000);
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -135,7 +135,7 @@ export function Register() {
       <p className="mt-4 text-center text-gray-600">
         ¿Ya tienes una cuenta?{" "}
         <button
-          onClick={() => navigate("https://interfaces-proyecto-r-production.up.railway.app/login")}
+          onClick={() => navigate("/login")}
           className="text-blue-600 hover:underline"
         >
           Inicia Sesión

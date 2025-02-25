@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaInfoCircle, FaPlay, FaStop } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
+
 interface D2RTestProps {
   endTest: () => void;
 }
@@ -111,6 +112,16 @@ const D2RTest: React.FC<D2RTestProps> = ({ endTest }) => {
 
   const interpretations = getInterpretations(score);
 
+  // Función adicional para detener el stream de la cámara.
+  const stopCameraStream = () => {
+    // Busca el elemento <video> que se haya renderizado (por ejemplo, desde react-webcam)
+    const videoElem = document.querySelector('video');
+    if (videoElem && videoElem.srcObject) {
+      const stream = videoElem.srcObject as MediaStream;
+      stream.getTracks().forEach((track) => track.stop());
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-4">
       {isInstructionsVisible && (
@@ -208,9 +219,11 @@ const D2RTest: React.FC<D2RTestProps> = ({ endTest }) => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
+              // Lógica adicional: detiene el stream de la cámara
+              stopCameraStream();
               setIsResultsVisible(false);
-              endTest(); // endTest debe redirigir al TestingArea
-              navigate('/testing');
+              endTest();
+              navigate('/dashboard');
             }}
             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
           >

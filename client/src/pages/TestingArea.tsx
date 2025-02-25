@@ -449,6 +449,99 @@ export function TestingArea() {
   const webcamRef = useRef<Webcam>(null);
   const navigate = useNavigate();
 
+  // Ref para almacenar la función de "stop" de Morphcast
+  const morphcastRef = useRef<{ stop: Function } | null>(null);
+
+  // Función auxiliar para cargar scripts externos
+  const loadScript = (src: string, config: string | null = null): Promise<void> => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.type = "text/javascript";
+      script.onload = () => resolve();
+      if (config) {
+        script.setAttribute("data-config", config);
+      }
+      script.src = src;
+      document.head.appendChild(script);
+    });
+  };
+
+  // Función para iniciar la API de Morphcast
+  const startMorphcast = async () => {
+    if (morphcastRef.current) return; // Evitar múltiples inicios
+    await loadScript("https://ai-sdk.morphcast.com/v1.16/ai-sdk.js");
+    const sdk = (window as any).CY;
+    if (sdk) {
+      sdk
+        .loader()
+        .licenseKey("sk9745abaac13f90436a06d81654e629794eb31e503851")
+        .addModule(sdk.modules().FACE_ATTENTION.name, { smoothness: 0.83 })
+        .addModule(sdk.modules().DATA_AGGREGATOR.name, { initialWaitMs: 2000, periodMs: 1000 })
+        .load()
+        .then(({ start, stop }: { start: Function; stop: Function }) => {
+          start();
+          // Guardamos la función de stop para poder detener la API luego
+          morphcastRef.current = { stop };
+        });
+
+      // Se agregan los event listeners según la integración original
+      window.addEventListener(sdk.modules().EVENT_BARRIER.eventName, (e: any) => {
+        console.log("EVENT_BARRIER result", e.detail);
+      });
+      window.addEventListener(sdk.modules().DATA_AGGREGATOR.eventName, (e: any) => {
+        console.log("DATA_AGGREGATOR result", e.detail);
+      });
+    }
+  };
+
+  // Función para detener la API de Morphcast
+  const stopMorphcast = () => {
+    if (morphcastRef.current && typeof morphcastRef.current.stop === "function") {
+      morphcastRef.current.stop();
+      morphcastRef.current = null;
+    }
+  };
+
+  // Función para iniciar la API de GazeRecorder
+  const startGazeRecorder = () => {
+    if ((window as any).GazeRecorderAPI && typeof (window as any).GazeRecorderAPI.Rec === "function") {
+      // En este caso se inicia en la misma página
+      (window as any).GazeRecorderAPI.Rec();
+    } else {
+      // Si aún no está cargada la API, se carga dinámicamente
+      const script = document.createElement("script");
+      script.src = "https://app.gazerecorder.com/GazeRecorderAPI.js";
+      script.async = true;
+      script.onload = () => {
+        if ((window as any).GazeRecorderAPI && typeof (window as any).GazeRecorderAPI.Rec === "function") {
+          (window as any).GazeRecorderAPI.Rec();
+        }
+      };
+      document.head.appendChild(script);
+    }
+  };
+
+  // Función para detener la grabación con GazeRecorder
+  const stopGazeRecorder = () => {
+    if ((window as any).GazeRecorderAPI && typeof (window as any).GazeRecorderAPI.StopRec === "function") {
+      (window as any).GazeRecorderAPI.StopRec();
+    }
+  };
+
+  // Hook que inicia/detiene las APIs según el estado de la cámara (y por ende de los minijuegos)
+  useEffect(() => {
+    if (cameraActive) {
+      // Al activar la cámara se inician las APIs
+      startMorphcast();
+      startGazeRecorder();
+    } else {
+      // Al desactivar la cámara se detienen las APIs
+      stopMorphcast();
+      stopGazeRecorder();
+    }
+    // Se ejecuta cada vez que cambie cameraActive
+  }, [cameraActive]);
+
   // Función para activar/desactivar la cámara
   const toggleCamera = useCallback(() => {
     setCameraActive((prev) => !prev);
@@ -489,7 +582,7 @@ export function TestingArea() {
 
         {/* Sección de Minijuegos y Test */}
         <div className="space-y-4">
-          {/* Aquí se muestran los minijuegos */}
+          {/* Sección de Minijuegos */}
           <div className="bg-white p-6 rounded-xl border border-gray-200">
             <div className="flex items-center gap-3 mb-4">
               <GamepadIcon className="w-6 h-6 text-blue-600" />
@@ -519,7 +612,7 @@ export function TestingArea() {
             <button
               disabled={!gamesCompleted || !cameraActive}
               role="button"
-              onClick={() => navigate('https://interfaces-proyecto-r-production.up.railway.app/d2r')}
+              onClick={() => navigate("/d2r")}
               className={`w-full py-2 px-4 rounded-lg transition-colors ${
                 gamesCompleted && cameraActive
                   ? "bg-blue-600 text-white hover:bg-blue-700"
